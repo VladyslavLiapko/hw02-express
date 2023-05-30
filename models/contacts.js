@@ -2,6 +2,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const { nanoid } = require('nanoid');
 const contactsPath = path.join(__dirname, "contacts.json");
+const {Contact} = require('./contact')
 
 
 const listContacts = async () => {
@@ -50,10 +51,27 @@ const updateContact = async (contactId, body) => {
   return contacts[index];
 };
 
+const updateStatusContact = async (req, res) => {
+  const { _id: owner } = req.user;
+
+  const { contactId } = req.params;
+  const { favorite } = req.body;
+  const contact = await Contact.findOneAndUpdate(
+    { owner, _id: contactId },
+    { favorite },
+    { new: true }
+  );
+  if (!contact) {
+    return res.status(404).json({ message: "Not found" });
+  }
+  return res.status(200).json({ contact });
+};
+
 module.exports = {
   listContacts,
   getContactById,
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact
 };
