@@ -76,11 +76,30 @@ router.put('/:contactId', async (req, res, next) => {
      if (!result) {
        throw HttpError(404, `Not found`);
      }
-
+ 
      res.json(result);
    } catch (error) {
      next(error);
    }
+})
+
+router.patch( '/:contactId/favorite',async(req, res, next) =>{
+  try {
+    const { error } = contactAddSchema.validate(req.body);
+    if (error) {
+      throw HttpError(400, error.message);
+    }
+    const { contactId } = req.params;
+    const result = await contactsService.updateStatusContact(contactId, req.body);
+    if (!result) {
+      throw HttpError(404, `Not found`);
+    }
+
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+  
 })
 
 module.exports = router;
